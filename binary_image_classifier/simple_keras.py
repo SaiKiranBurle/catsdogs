@@ -3,7 +3,7 @@ from keras.layers import Conv2D, Activation, MaxPooling2D, Flatten, Dense, Dropo
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 
-TRAIN_PATH = '/Users/sai/dev/catsdogs/data2/train/'
+TRAIN_PATH = '/Users/sai/dev/datasets/catsdogs-kaggle/data2/train/'
 
 # Constants
 NUM_CHANNELS = 3
