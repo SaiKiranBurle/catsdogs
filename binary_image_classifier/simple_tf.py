@@ -3,14 +3,14 @@ import glob
 import tensorflow as tf
 from IPython import embed
 
-DATASET_BATCH_SIZE = 50
-IMAGE_X = 200
-IMAGE_Y = 200
+DATASET_BATCH_SIZE = 16
+IMAGE_X = 160
+IMAGE_Y = 160
 IMAGE_N_CHANNELS = 3
 FLATTEN_IMAGE = False
 NUM_CATEGORIES = 2
 
-PATH_REGEX = '/Users/sai/dev/catsdogs/data/train/*.jpg'
+PATH_REGEX = '/Users/sai/dev/datasets/catsdogs-kaggle/data/train/*.jpg'
 
 
 def _parse_images(filename, filename_2):
@@ -85,7 +85,7 @@ def max_pool_2x2(x):
 
 def convolution_model(x, y_, keep_prob):
     # Conv layer 1
-    W_conv1 = initialize_weights(shape=[5, 5, 3, 32])   # [patch_size, patch_size, num_channels, output_depth]
+    W_conv1 = initialize_weights(shape=[3, 3, 3, 32])   # [patch_size, patch_size, num_channels, output_depth]
     # b_conv1 = initialize_biases(shape=[IMAGE_X, IMAGE_Y, IMAGE_N_CHANNELS, 32])     # Maybe this works too?
     b_conv1 = initialize_biases(shape=[32])
     z_conv1 = tf.nn.relu(conv2d(x, W_conv1) + b_conv1)
@@ -98,22 +98,28 @@ def convolution_model(x, y_, keep_prob):
     z_conv2 = tf.nn.relu(conv2d(z_conv1, W_conv2) + b_conv2)
     z_conv2 = max_pool_2x2(z_conv2)
 
-    W_fc1 = initialize_weights(shape=[50 * 50 * 32, 512])
-    b_fc1 = initialize_biases(shape=[512])
-    z_conv2_flat = tf.reshape(z_conv2, [-1, 50 * 50 * 32])
+    # Conv layer 3
+    W_conv3 = initialize_weights(shape=[3, 3, 32, 64])  # [patch_size, patch_size, num_channels, output_depth]
+    b_conv3 = initialize_biases(shape=[64])
+    z_conv3 = tf.nn.relu(conv2d(z_conv2, W_conv3) + b_conv3)
+    z_conv3 = max_pool_2x2(z_conv3)
+
+    W_fc1 = initialize_weights(shape=[50 * 50 * 32, 64])
+    b_fc1 = initialize_biases(shape=[64])
+    z_conv2_flat = tf.reshape(z_conv3, [-1, 50 * 50 * 32])
     z_fc1 = tf.nn.relu(tf.matmul(z_conv2_flat, W_fc1) + b_fc1)
 
     z_dropout1 = tf.nn.dropout(z_fc1, keep_prob)
 
-    W_out1 = initialize_weights(shape=[512, 64])
-    b_out1 = initialize_biases(shape=[64])
+    W_out1 = initialize_weights(shape=[64, 2])
+    b_out1 = initialize_biases(shape=[2])
     z_out1 = tf.matmul(z_dropout1, W_out1) + b_out1
 
-    W_out2 = initialize_weights(shape=[64, 2])
-    b_out2 = initialize_biases(shape=[2])
-    z_out2 = tf.matmul(z_out1, W_out2) + b_out2
+    # W_out2 = initialize_weights(shape=[64, 2])
+    # b_out2 = initialize_biases(shape=[2])
+    # z_out2 = tf.matmul(z_out1, W_out2) + b_out2
 
-    y = z_out2
+    y = z_out1
     return y
 
 
