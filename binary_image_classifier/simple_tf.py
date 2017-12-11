@@ -104,10 +104,10 @@ def convolution_model(x, y_, keep_prob):
     z_conv3 = tf.nn.relu(conv2d(z_conv2, W_conv3) + b_conv3)
     z_conv3 = max_pool_2x2(z_conv3)
 
-    W_fc1 = initialize_weights(shape=[50 * 50 * 32, 64])
+    W_fc1 = initialize_weights(shape=[20 * 20 * 64, 64])
     b_fc1 = initialize_biases(shape=[64])
-    z_conv2_flat = tf.reshape(z_conv3, [-1, 50 * 50 * 32])
-    z_fc1 = tf.nn.relu(tf.matmul(z_conv2_flat, W_fc1) + b_fc1)
+    z_conv3_flat = tf.reshape(z_conv3, [-1, 20 * 20 * 64])
+    z_fc1 = tf.nn.relu(tf.matmul(z_conv3_flat, W_fc1) + b_fc1)
 
     z_dropout1 = tf.nn.dropout(z_fc1, keep_prob)
 
